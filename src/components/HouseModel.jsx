@@ -1,7 +1,7 @@
 import React from 'react';
 import { FloorPlane } from './FloorPlane';
 
-export function HouseModel({ floorSpacing = 3, opacity = 1, visibility }) {
+export function HouseModel({ floorSpacing = 3, opacity = 1, visibility, displacementScale = 0 }) {
     return (
         <group>
             {/* Bottom Floor */}
@@ -10,6 +10,7 @@ export function HouseModel({ floorSpacing = 3, opacity = 1, visibility }) {
                 position={[0, 0, 0]}
                 visible={visibility.bottom}
                 opacity={opacity}
+                displacementScale={displacementScale}
             />
 
             {/* Middle Floor */}
@@ -18,6 +19,7 @@ export function HouseModel({ floorSpacing = 3, opacity = 1, visibility }) {
                 position={[0, floorSpacing, 0]}
                 visible={visibility.middle}
                 opacity={opacity}
+                displacementScale={displacementScale}
             />
 
             {/* Top Floor */}
@@ -26,6 +28,7 @@ export function HouseModel({ floorSpacing = 3, opacity = 1, visibility }) {
                 position={[0, floorSpacing * 2, 0]}
                 visible={visibility.top}
                 opacity={opacity}
+                displacementScale={displacementScale}
             />
         </group>
     );
