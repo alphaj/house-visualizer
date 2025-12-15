@@ -20,6 +20,10 @@ function App() {
   const [measurementMode, setMeasurementMode] = useState(false);
   const [measurePoints, setMeasurePoints] = useState([]);
 
+  // Geolocation State
+  const [seasonMonth, setSeasonMonth] = useState(0); // 0 = Jan (Summer in NZ)
+  const [northOffset, setNorthOffset] = useState(0); // Rotation of North in degrees
+
   const toggleFloor = (floor) => {
     setVisibility(prev => ({ ...prev, [floor]: !prev[floor] }));
   };
@@ -37,6 +41,9 @@ function App() {
     }
   };
 
+  // Month labels
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#f0f0f0' }}>
       <Canvas onClick={handleCanvasClick}>
@@ -46,10 +53,23 @@ function App() {
           <PerspectiveCamera makeDefault position={[10, 15, 15]} fov={45} />
         )}
 
-        <SunControl timeOfDay={timeOfDay} />
+        {/* Sun Control with Real Physics */}
+        <SunControl
+          timeOfDay={timeOfDay}
+          seasonMonth={seasonMonth}
+          northOffset={northOffset}
+        />
 
         <Suspense fallback={null}>
           <group position={[0, -2, 0]}>
+            {/* Rotating the house container to match compass? 
+                 Actually better to rotate the Sun around the house, which SunControl does via northOffset.
+                 But we want to visualize the generic "North" direction on the floor. */}
+
+            {/* Compass Helper Mesh (only visible if we want) */}
+            <mesh rotation={[-Math.PI / 2, 0, northOffset * Math.PI / 180]} position={[0, -0.1, 0]}>
+              {/* A simple arrow or line indicating North could go here, but shadows tell the story. */}
+            </mesh>
             {/* We need to update HouseModel to accept displacementScale. I'll pass it as a prop after updating the file. */}
             <HouseModel
               floorSpacing={spacing}
@@ -99,6 +119,9 @@ function App() {
         overflowY: 'auto'
       }}>
         <h3 style={{ margin: '0 0 15px 0', fontSize: '18px' }}>House Visualizer Pro</h3>
+        <p style={{ margin: '0 0 15px 0', fontSize: '12px', color: '#666' }}>
+          📍 139 May Road, Auckland
+        </p>
 
         {/* Helper Message */}
         {measurementMode && (
@@ -118,6 +141,29 @@ function App() {
             value={timeOfDay} onChange={e => setTimeOfDay(parseFloat(e.target.value))}
             style={{ width: '100%' }}
           />
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: 600 }}>
+            📅 Season: {months[seasonMonth]}
+          </label>
+          <input
+            type="range" min="0" max="11" step="1"
+            value={seasonMonth} onChange={e => setSeasonMonth(parseInt(e.target.value))}
+            style={{ width: '100%' }}
+          />
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: 600 }}>
+            🧭 Compass Rotation: {northOffset}°
+          </label>
+          <input
+            type="range" min="0" max="360" step="10"
+            value={northOffset} onChange={e => setNorthOffset(parseInt(e.target.value))}
+            style={{ width: '100%' }}
+          />
+          <div style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>align house to "North"</div>
         </div>
 
         <div style={{ marginBottom: '15px' }}>
